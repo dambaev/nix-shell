@@ -3,14 +3,15 @@ let
   syncfromremote = pkgs.writeScriptBin "syncfromremote" ''
     PWD=$(pwd | cut -c $(( $(echo $HOME | wc -c  ) + 1 ))-)
     LOCAL_COMMIT=$( git log | head -n 1 | awk '{ print $2}')
-    REMOTE_COMMIT=$(ssh $REMOTEMAKEHOST "cd $PWD; git log | head -n 1 | awk '{ print $2}'")
-    REMOTE_DIFF=$(ssh $REMOTEMAKEHOST "cd $PWD; git diff --relative")
+    REMOTE_COMMIT=$(ssh $REMOTEMAKEHOST "cd $PWD; git log | head -n 1 | awk '{ print \$2}'")
+    echo "LOCAL_COMMIT = $LOCAL_COMMIT"
+    echo "REMOTE_COMMIT = $REMOTE_COMMIT"
     git diff --relative | patch -p1 -R;
     if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
       git pull;
-      git checkout $COMMIT;
+      git checkout $REMOTE_COMMIT;
     fi;
-    echo $REMOTE_DIFF | patch -p1
+    ssh $REMOTEMAKEHOST "cd $PWD; git diff --relative" | patch -p1
   '';
   remotemake = pkgs.writeScriptBin "remotemake" ''
     PWD=$(pwd | cut -c $(( $(echo $HOME | wc -c  ) + 1 ))-)
