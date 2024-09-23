@@ -54,6 +54,15 @@ let
                       procps
 
                       inetutils
+                      procps
+                      screen
+
+                      openssh
+
+                      firefox
+                      chromium
+                      roxterm
+                      dbus
                     ];
   };
 
