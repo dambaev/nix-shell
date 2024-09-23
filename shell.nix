@@ -1,7 +1,7 @@
 let
   pkgs = (import <nixpkgs> {}); # first, load the nixpkgs with system-wide overlays
   remotemake = pkgs.writeScriptBin "remotemake" ''
-    PWD=$(pwd)
+    PWD=$(pwd | cut -c $(( $(echo $HOME | wc -c  ) + 1 ))-)
     DIFF=$(git diff --relative)
     COMMIT=$(git log | head -n 1 | awk '{ print $2}')
     echo "$DIFF" | ssh -A $REMOTEMAKEHOST "cd $PWD; LOCAL_COMMIT=\$(git log | head -n 1 | awk '{print \$2}'); echo "LOCAL GIT COMMIT \$LOCAL_COMMIT"; \
@@ -18,7 +18,7 @@ let
     if [[ $# -eq 1 ]]; then
       selected=$1
     else
-      selected=$(find ~/.config /data/devel /data/share/work26 /data/share/work26/tgbot /data/devel/op-energy/oe-account-service /data/devel/op-energy-blockspan-service /data/devel/nixos -mindepth 1 -maxdepth 1 -type d | fzf)
+      selected=$(find ~/.config ~/data/devel ~/data/share/work26 ~/data/share/work26/tgbot ~/data/devel/op-energy/oe-account-service ~/data/devel/op-energy-blockspan-service ~/data/devel/nixos -mindepth 1 -maxdepth 1 -type d | fzf)
     fi
 
     if [[ -z $selected ]]; then
@@ -51,6 +51,9 @@ let
                       git
                       tmux fzf tmux-sessionizer
                       ripgrep
+                      procps
+
+                      inetutils
                     ];
   };
 
